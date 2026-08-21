@@ -10,7 +10,7 @@ from dashboard.analytics.kpis import compute_kpis
 from dashboard.analytics.receipt import get_receipt
 from dashboard.analytics.trends import monthly_spend
 from dashboard.charts import chart_card
-from dashboard.components import empty_state, kpi_card, kpi_row, section
+from dashboard.components import empty_state, kpi_card, kpi_row, limit_select, section
 from dashboard.data.store import get_upload_history
 from dashboard.layout import page
 from dashboard.palette import SINGLE_SERIES
@@ -65,7 +65,7 @@ def _receipt_accordion_item(receipt: dict):
 
 def register_overview_routes(rt):
     @rt("/dashboard")
-    def get(start: str = "", end: str = ""):
+    def get(start: str = "", end: str = "", limit: int = 10):
         receipts_df, items_df, tenders_df, filter_bar = load_filtered("/dashboard", start, end)
 
         if filter_bar is None:
@@ -106,18 +106,22 @@ def register_overview_routes(rt):
         fig.update_traces(marker_color=SINGLE_SERIES, marker_line_width=0)
         trend_chart = chart_card(fig)
 
-        recent_ids = receipts_df.sort_values("transaction_date", ascending=False)["receipt_id"].head(10)
+        sorted_ids = receipts_df.sort_values("transaction_date", ascending=False)["receipt_id"]
+        recent_ids = sorted_ids if limit == 0 else sorted_ids.head(limit)
         recent_receipts = [get_receipt(receipts_df, items_df, tenders_df, rid) for rid in recent_ids]
         recent_accordion = Accordion(
             *[_receipt_accordion_item(r) for r in recent_receipts if r is not None],
             multiple=True,
+        )
+        recent_count_control = limit_select(
+            "/dashboard", limit, [5, 10, 25, 50], {"start": start, "end": end}
         )
 
         return page(
             "Dashboard",
             cards,
             section("Monthly Spend", trend_chart, icon="bar-chart-3"),
-            section("Recent Receipts", recent_accordion, icon="clock"),
+            section("Recent Receipts", recent_accordion, icon="clock", controls=recent_count_control),
             active="/dashboard",
             subtitle=subtitle,
             filter_bar=filter_bar,

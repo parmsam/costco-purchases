@@ -28,17 +28,41 @@ def kpi_row(*cards):
     return Div(*cards, cls="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8")
 
 
-def section(title: str, *content, icon: str = ""):
+def section(title: str, *content, icon: str = "", controls=None):
+    title_group = DivLAligned(
+        UkIcon(icon, height=17, width=17, cls="text-muted-foreground") if icon else "",
+        H4(title),
+        cls="gap-2",
+    )
     heading = (
-        DivLAligned(
-            UkIcon(icon, height=17, width=17, cls="text-muted-foreground") if icon else "",
-            H4(title),
-            cls="gap-2 mb-3",
-        )
-        if icon
-        else H4(title, cls="mb-3")
+        Div(title_group, controls, cls="flex items-center justify-between mb-3")
+        if controls is not None
+        else Div(title_group, cls="mb-3")
     )
     return Div(heading, *content, cls="mb-10")
+
+
+def limit_select(path: str, current: int, options: list[int], hidden_fields: dict, label: str = "Show"):
+    """A GET-form <select> (auto-submits on change) for a 'how many rows' control.
+
+    Plain native <select> rather than MonsterUI's LabelSelect — that one
+    renders as a JS-enhanced custom element with its own event handling,
+    which isn't guaranteed to fire a plain `onchange`. A native <select>
+    styled with franken-ui's `uk-select` class is predictable and doesn't
+    depend on that component's internals.
+    """
+    from fasthtml.common import Input, Option, Select
+
+    opts = [Option(str(n), value=str(n), selected=(n == current)) for n in options]
+    opts.append(Option("All", value="0", selected=(current == 0)))
+    return Form(
+        *[Input(type="hidden", name=k, value=v) for k, v in hidden_fields.items() if v],
+        Span(label, cls="text-sm text-muted-foreground mr-2"),
+        Select(*opts, name="limit", onchange="this.form.submit()", cls="uk-select w-auto text-sm py-1"),
+        action=path,
+        method="get",
+        cls="flex items-center",
+    )
 
 
 def _sortable_th(text):
