@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Warehouses</title>
+    <link rel="canonical" href="https://parmsam.github.io/costco-purchases/warehouses.html">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.js"></script><script src="https://cdn.jsdelivr.net/gh/answerdotai/fasthtml-js@1.0.12/fasthtml.js"></script><script src="https://cdn.jsdelivr.net/gh/answerdotai/surreal@main/surreal.js"></script><script src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js"></script>    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/css/core.min.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/js/core.iife.js"></script><script src="https://cdn.tailwindcss.com/3.4.17"></script><script>
+    tailwind.config = {
+        darkMode: 'selector',
+    }
+    </script><script>
+        const htmlElement = document.documentElement;
+        
+          
+          const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+    
+          if (
+            __FRANKEN__.mode === "dark" ||
+            (!__FRANKEN__.mode &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            htmlElement.classList.add("dark");
+          } else {
+            htmlElement.classList.remove("dark");
+          }
+        
+          htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-blue");
+          htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+          htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+          htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+    </script>    <style>
+.monster-navbar.navbar-bold a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.monster-navbar.navbar-bold a.uk-active {
+    transform: scale(1.15) ;
+    font-weight: bold;
+    text-shadow: 0 0 12px rgba(var(--p-rgb), 0.4);
+    letter-spacing: 0.02em;
+    color: hsl(var(--p) / 1);
+}
+.monster-navbar.navbar-underline a.uk-active { position: relative; }
+.monster-navbar.navbar-underline a.uk-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    animation: slideIn 0.3s ease forwards;
+}
+@keyframes slideIn {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+</style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/js/icon.iife.js"></script>    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css">
+    <style>
+:root {
+  --b1: from hsl(var(--background)) l c h;
+  --bc: from hsl(var(--foreground)) l c h;
+  --m: from hsl(var(--muted)) l c h;
+  --mc: from hsl(var(--muted-foreground)) l c h;
+  --po: from hsl(var(--popover)) l c h;
+  --poc: from hsl(var(--popover-foreground)) l c h;
+  --b2: from hsl(var(--card)) l c h;
+  --b2c: from hsl(var(--card-foreground)) l c h;
+  --br: from hsl(var(--border)) l c h;
+  --in: from hsl(var(--input)) l c h;
+  --p: from hsl(var(--primary)) l c h;
+  --pc: from hsl(var(--primary-foreground)) l c h;
+  --s: from hsl(var(--secondary)) l c h;
+  --sc: from hsl(var(--secondary-foreground)) l c h;
+  --a: from hsl(var(--accent)) l c h;
+  --ac: from hsl(var(--accent-foreground)) l c h;
+  --er: from hsl(var(--destructive)) l c h;
+  --erc: from hsl(var(--destructive-foreground)) l c h;
+  --b3: from hsl(var(--ring)) l c h;
+  --ch1: from hsl(var(--chart-1)) l c h;
+  --ch2: from hsl(var(--chart-2)) l c h;
+  --ch3: from hsl(var(--chart-3)) l c h;
+  --ch4: from hsl(var(--chart-4)) l c h;
+  --ch5: from hsl(var(--chart-5)) l c h;
+  --rd: var(--radius);
+}
+</style>
+    <style>
+body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
+/* FastHTML's Titled() wraps every page in <main class="container">. Pico
+   was the one giving that a centered max-width; Tailwind's own .container
+   utility (now the only one matching) sets a max-width per breakpoint but,
+   unlike Pico's, doesn't auto-center by default. Restoring just the
+   centering here, since removing Pico dropped it. */
+main.container { margin-left: auto; margin-right: auto; }
+</style>
+<script>
+function _frankenState() {
+  try { return JSON.parse(localStorage.getItem('__FRANKEN__') || '{}'); } catch (e) { return {}; }
+}
+function _applyThemeMode(mode) {
+  var isDark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.classList.toggle('dark', isDark);
+  var icon = document.getElementById('theme-toggle-icon');
+  if (icon) icon.setAttribute('icon', !mode ? 'monitor' : (mode === 'dark' ? 'moon' : 'sun'));
+}
+function cycleTheme() {
+  var state = _frankenState();
+  var order = ['system', 'light', 'dark'];
+  var current = state.mode || 'system';
+  var next = order[(order.indexOf(current) + 1) % order.length];
+  if (next === 'system') { delete state.mode; } else { state.mode = next; }
+  localStorage.setItem('__FRANKEN__', JSON.stringify(state));
+  _applyThemeMode(state.mode);
+}
+document.addEventListener('DOMContentLoaded', function () { _applyThemeMode(_frankenState().mode); });
+</script><script>
+function sortTableBy(th) {
+  var table = th.closest('table');
+  var tbody = table.querySelector('tbody');
+  var headerRow = th.parentElement;
+  var cellIndex = Array.prototype.indexOf.call(headerRow.children, th);
+  var nextDir = th.getAttribute('data-sort-dir') === 'asc' ? 'desc' : 'asc';
+
+  Array.prototype.forEach.call(headerRow.children, function (h) {
+    h.removeAttribute('data-sort-dir');
+    var ind = h.querySelector('.sort-indicator');
+    if (ind) ind.textContent = '';
+  });
+  th.setAttribute('data-sort-dir', nextDir);
+  var indicator = th.querySelector('.sort-indicator');
+  if (indicator) indicator.textContent = nextDir === 'asc' ? ' \u25B2' : ' \u25BC';
+
+  function cellValue(tr) {
+    var cell = tr.children[cellIndex];
+    var text = (cell.textContent || '').trim();
+    var cleaned = text.replace(/[$,%]/g, '');
+    var num = parseFloat(cleaned);
+    var isNumeric = cleaned !== '' && !isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleaned);
+    return isNumeric ? num : text.toLowerCase();
+  }
+
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  rows.sort(function (a, b) {
+    var av = cellValue(a), bv = cellValue(b);
+    if (typeof av === 'number' && typeof bv === 'number') {
+      return nextDir === 'asc' ? av - bv : bv - av;
+    }
+    av = String(av); bv = String(bv);
+    return nextDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(function (r) { tbody.appendChild(r); });
+}
+</script><script src="https://cdn.plot.ly/plotly-3.7.0.min.js"></script><script>
+    const fhPlotlyRegisterOnClick = (plotId, hxPostEndpoint, hxTarget) => {
+        const plotlyPlot = document.getElementById(plotId);
+        plotlyPlot.on('plotly_click', (data) => {
+            const point = data.points[0];
+            const x = point.x;
+            const y = point.y;
+            const payload = new FormData();
+            payload.append('x', x);
+            payload.append('y', y);
+            payload.append('plot_id', plotId);
+            htmx.ajax("POST", hxPostEndpoint, {values: payload, target: hxTarget});
+        });
+    };
+    </script>  </head>
+  <body>
+<div style="background:#eef2ff;border-bottom:1px solid #c7d2fe;padding:10px 16px;text-align:center;font-size:13px;font-family:system-ui,-apple-system,sans-serif;">
+  📊 Static demo with synthetic sample data — not your real purchases. Live search and file upload are disabled here.
+  <a href="https://github.com/parmsam/costco-purchases" style="color:#4338ca;font-weight:600;">Run it yourself →</a>
+</div>
+<main class="container">      <div class="mb-8">
+        <nav class="monster-navbar flex flex-wrap items-center justify-between w-full px-4 py-2.5 border-b border-border/60 backdrop-blur bg-background/95  sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
+          <div class="flex justify-start items-center gap-2">
+<uk-icon icon="shopping-cart" height="20" width="20" class="text-primary"></uk-icon>            <div class="font-bold text-lg">Costco Purchases</div>
+          </div>
+<button aria-controls="mobile-menu" type="button" data-uk-toggle="target: #mobile-menu; cls: hidden" class="md:hidden inline-flex items-center justify-center uk-rounded focus:outline-none focus:ring-2 p-2"><span class="sr-only">Open main menu</span><uk-icon icon="menu" height="24" width="24" class="size-6"></uk-icon></button>          <div id="mobile-menu" class="hidden mt-2 md:mt-0 w-full md:block md:w-auto ">
+            <div class="flex gap-3 flex-col items-end md:flex-row md:items-center md:gap-3">
+<a href="dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layout-dashboard" height="16" width="16"></uk-icon>Dashboard</a><a href="trends.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="trending-up" height="16" width="16"></uk-icon>Trends</a><a href="items.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="shopping-cart" height="16" width="16"></uk-icon>Items</a><a href="warehouses.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-primary/10 text-primary"><uk-icon icon="warehouse" height="16" width="16"></uk-icon>Warehouses</a><a href="departments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layers" height="16" width="16"></uk-icon>Departments</a><a href="payments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="credit-card" height="16" width="16"></uk-icon>Payments</a><a href="upload.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="upload" height="16" width="16"></uk-icon>Upload</a><button onclick="cycleTheme()" type="button" id="theme-toggle-btn" class="uk-btn uk-btn-ghost rounded-full px-2" title="Toggle theme (system / light / dark)" name="theme-toggle-btn"><uk-icon icon="monitor" height="16" width="16" id="theme-toggle-icon"></uk-icon></button>            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="container mx-auto px-4 pb-16 max-w-6xl">
+        <div class="mb-6">
+          <div class="flex justify-start items-center gap-2.5">
+<uk-icon icon="warehouse" height="26" width="26" class="text-primary"></uk-icon>            <h2 class="uk-h2 font-bold">Warehouses</h2>
+          </div>
+          <p class="text-gray-500 dark:text-gray-200 text-sm mt-1.5">Where you shop</p>
+        </div>
+        <div class="uk-card mb-6 p-4">
+          <div class="uk-card-body space-y-6">
+<form enctype="multipart/form-data" action="warehouses.html" method="get">              <div class="flex flex-wrap gap-1.5 mb-3">
+<a href="warehouses.html" class="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors">Last 30 Days</a><a href="warehouses.html" class="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors">Last 90 Days</a><a href="warehouses.html" class="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors">This Year</a><a href="warehouses.html" class="text-xs px-2.5 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors">All Time</a>              </div>
+              <div class="flex flex-wrap items-end gap-3">
+                <div class="space-y-1">
+<label for="from" class="uk-form-label ">From</label>                  <input type="date" name="start" value="" min="2024-08-27" max="2026-08-12" id="from" class="uk-input ">
+                </div>
+                <div class="space-y-1">
+<label for="to" class="uk-form-label ">To</label>                  <input type="date" name="end" value="" min="2024-08-27" max="2026-08-12" id="to" class="uk-input ">
+                </div>
+<button type="submit" class="uk-btn uk-btn-primary">Apply</button>              </div>
+</form>          </div>
+        </div>
+        <div class="mb-10">
+          <div class="flex justify-start items-center gap-2 mb-3">
+<uk-icon icon="bar-chart-3" height="17" width="17" class="text-muted-foreground"></uk-icon>            <h4 class="uk-h4 ">Spend by Warehouse</h4>
+          </div>
+          <div class="uk-card ">
+            <div class="uk-card-body space-y-6">
+              <div class="uk-card-body ">
+                <div class="w-full">
+                  <div id="uniq-f3302d70-b62f-42b1-b094-2bd82ed2cc74">
+<script>
+        var plotly_data = {"data":[{"hovertemplate":"Spend ($)=%{x}\u003cbr\u003e=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#2a78d6","pattern":{"shape":""},"line":{"width":0}},"name":"","orientation":"h","showlegend":false,"textposition":"auto","x":{"dtype":"f8","bdata":"j8L1KNzSsUAzMzMzM0a1QIXrUbieNLlA"},"xaxis":"x","y":["SAMPLE TOWN","FIXTURE HEIGHTS","DEMO CITY"],"yaxis":"y","type":"bar"}],"layout":{"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Spend ($)","font":{"color":"#898781"}},"tickfont":{"color":"#898781"},"gridcolor":"#e1e0d9","linecolor":"#c3c2b7"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"","font":{"color":"#898781"}},"tickfont":{"color":"#898781"},"gridcolor":"#e1e0d9","linecolor":"#c3c2b7","zeroline":false},"legend":{"tracegroupgap":0,"orientation":"h","yanchor":"bottom","y":1.02,"xanchor":"left","x":0,"title":{}},"margin":{"t":16,"l":48,"r":24,"b":48},"barmode":"relative","font":{"family":"system-ui, -apple-system, \"Segoe UI\", sans-serif","color":"#0b0b0b","size":13},"hoverlabel":{"font":{"size":13,"family":"system-ui, -apple-system, \"Segoe UI\", sans-serif"},"bgcolor":"#ffffff"},"height":240,"paper_bgcolor":"#fcfcfb","plot_bgcolor":"#fcfcfb"}};
+        Plotly.newPlot('uniq-f3302d70-b62f-42b1-b094-2bd82ed2cc74', plotly_data.data, plotly_data.layout, {"displayModeBar": false, "responsive": true});
+    </script>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-10">
+          <div class="flex justify-start items-center gap-2 mb-3">
+<uk-icon icon="table" height="17" width="17" class="text-muted-foreground"></uk-icon>            <h4 class="uk-h4 ">Details</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="background-color:transparent;color:inherit;">
+              <thead class="border-b border-border" style="background-color:transparent;color:inherit;">
+                <tr style="background-color:transparent;color:inherit;">
+                  <th onclick="sortTableBy(this)" class="text-left font-medium text-xs uppercase tracking-wide text-muted-foreground px-3 py-2 cursor-pointer select-none hover:text-primary whitespace-nowrap" style="background-color:transparent;">
+<span class="inline-flex items-center">Warehouse<span class="sort-indicator ml-1 text-xs"></span></span>                  </th>
+                  <th onclick="sortTableBy(this)" class="text-left font-medium text-xs uppercase tracking-wide text-muted-foreground px-3 py-2 cursor-pointer select-none hover:text-primary whitespace-nowrap" style="background-color:transparent;">
+<span class="inline-flex items-center">Spend<span class="sort-indicator ml-1 text-xs"></span></span>                  </th>
+                  <th onclick="sortTableBy(this)" class="text-left font-medium text-xs uppercase tracking-wide text-muted-foreground px-3 py-2 cursor-pointer select-none hover:text-primary whitespace-nowrap" style="background-color:transparent;">
+<span class="inline-flex items-center">Visits<span class="sort-indicator ml-1 text-xs"></span></span>                  </th>
+                  <th onclick="sortTableBy(this)" class="text-left font-medium text-xs uppercase tracking-wide text-muted-foreground px-3 py-2 cursor-pointer select-none hover:text-primary whitespace-nowrap" style="background-color:transparent;">
+<span class="inline-flex items-center">Avg Basket<span class="sort-indicator ml-1 text-xs"></span></span>                  </th>
+                </tr>
+              </thead>
+              <tbody style="background-color:transparent;color:inherit;">
+                <tr class="border-b border-border/50 last:border-0 hover:bg-foreground/5 transition-colors" style="background-color:transparent;color:inherit;">
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">DEMO CITY</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$6,452.62</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">20</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$322.63</td>
+                </tr>
+                <tr class="border-b border-border/50 last:border-0 hover:bg-foreground/5 transition-colors" style="background-color:transparent;color:inherit;">
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">FIXTURE HEIGHTS</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$5,446.20</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">22</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$247.55</td>
+                </tr>
+                <tr class="border-b border-border/50 last:border-0 hover:bg-foreground/5 transition-colors" style="background-color:transparent;color:inherit;">
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">SAMPLE TOWN</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$4,562.86</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">18</td>
+                  <td class="px-3 py-2 align-top" style="background-color:transparent;color:inherit;">$253.49</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+</main>  </body>
+</html>

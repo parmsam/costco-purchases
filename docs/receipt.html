@@ -1,0 +1,284 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Receipt</title>
+    <link rel="canonical" href="https://parmsam.github.io/costco-purchases/receipt.html">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.js"></script><script src="https://cdn.jsdelivr.net/gh/answerdotai/fasthtml-js@1.0.12/fasthtml.js"></script><script src="https://cdn.jsdelivr.net/gh/answerdotai/surreal@main/surreal.js"></script><script src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js"></script>    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/css/core.min.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/js/core.iife.js"></script><script src="https://cdn.tailwindcss.com/3.4.17"></script><script>
+    tailwind.config = {
+        darkMode: 'selector',
+    }
+    </script><script>
+        const htmlElement = document.documentElement;
+        
+          
+          const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+    
+          if (
+            __FRANKEN__.mode === "dark" ||
+            (!__FRANKEN__.mode &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            htmlElement.classList.add("dark");
+          } else {
+            htmlElement.classList.remove("dark");
+          }
+        
+          htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-blue");
+          htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+          htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+          htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+    </script>    <style>
+.monster-navbar.navbar-bold a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.monster-navbar.navbar-bold a.uk-active {
+    transform: scale(1.15) ;
+    font-weight: bold;
+    text-shadow: 0 0 12px rgba(var(--p-rgb), 0.4);
+    letter-spacing: 0.02em;
+    color: hsl(var(--p) / 1);
+}
+.monster-navbar.navbar-underline a.uk-active { position: relative; }
+.monster-navbar.navbar-underline a.uk-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    animation: slideIn 0.3s ease forwards;
+}
+@keyframes slideIn {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+</style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/franken-ui@2.0.0/dist/js/icon.iife.js"></script>    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css">
+    <style>
+:root {
+  --b1: from hsl(var(--background)) l c h;
+  --bc: from hsl(var(--foreground)) l c h;
+  --m: from hsl(var(--muted)) l c h;
+  --mc: from hsl(var(--muted-foreground)) l c h;
+  --po: from hsl(var(--popover)) l c h;
+  --poc: from hsl(var(--popover-foreground)) l c h;
+  --b2: from hsl(var(--card)) l c h;
+  --b2c: from hsl(var(--card-foreground)) l c h;
+  --br: from hsl(var(--border)) l c h;
+  --in: from hsl(var(--input)) l c h;
+  --p: from hsl(var(--primary)) l c h;
+  --pc: from hsl(var(--primary-foreground)) l c h;
+  --s: from hsl(var(--secondary)) l c h;
+  --sc: from hsl(var(--secondary-foreground)) l c h;
+  --a: from hsl(var(--accent)) l c h;
+  --ac: from hsl(var(--accent-foreground)) l c h;
+  --er: from hsl(var(--destructive)) l c h;
+  --erc: from hsl(var(--destructive-foreground)) l c h;
+  --b3: from hsl(var(--ring)) l c h;
+  --ch1: from hsl(var(--chart-1)) l c h;
+  --ch2: from hsl(var(--chart-2)) l c h;
+  --ch3: from hsl(var(--chart-3)) l c h;
+  --ch4: from hsl(var(--chart-4)) l c h;
+  --ch5: from hsl(var(--chart-5)) l c h;
+  --rd: var(--radius);
+}
+</style>
+    <style>
+body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
+/* FastHTML's Titled() wraps every page in <main class="container">. Pico
+   was the one giving that a centered max-width; Tailwind's own .container
+   utility (now the only one matching) sets a max-width per breakpoint but,
+   unlike Pico's, doesn't auto-center by default. Restoring just the
+   centering here, since removing Pico dropped it. */
+main.container { margin-left: auto; margin-right: auto; }
+</style>
+<script>
+function _frankenState() {
+  try { return JSON.parse(localStorage.getItem('__FRANKEN__') || '{}'); } catch (e) { return {}; }
+}
+function _applyThemeMode(mode) {
+  var isDark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.classList.toggle('dark', isDark);
+  var icon = document.getElementById('theme-toggle-icon');
+  if (icon) icon.setAttribute('icon', !mode ? 'monitor' : (mode === 'dark' ? 'moon' : 'sun'));
+}
+function cycleTheme() {
+  var state = _frankenState();
+  var order = ['system', 'light', 'dark'];
+  var current = state.mode || 'system';
+  var next = order[(order.indexOf(current) + 1) % order.length];
+  if (next === 'system') { delete state.mode; } else { state.mode = next; }
+  localStorage.setItem('__FRANKEN__', JSON.stringify(state));
+  _applyThemeMode(state.mode);
+}
+document.addEventListener('DOMContentLoaded', function () { _applyThemeMode(_frankenState().mode); });
+</script><script>
+function sortTableBy(th) {
+  var table = th.closest('table');
+  var tbody = table.querySelector('tbody');
+  var headerRow = th.parentElement;
+  var cellIndex = Array.prototype.indexOf.call(headerRow.children, th);
+  var nextDir = th.getAttribute('data-sort-dir') === 'asc' ? 'desc' : 'asc';
+
+  Array.prototype.forEach.call(headerRow.children, function (h) {
+    h.removeAttribute('data-sort-dir');
+    var ind = h.querySelector('.sort-indicator');
+    if (ind) ind.textContent = '';
+  });
+  th.setAttribute('data-sort-dir', nextDir);
+  var indicator = th.querySelector('.sort-indicator');
+  if (indicator) indicator.textContent = nextDir === 'asc' ? ' \u25B2' : ' \u25BC';
+
+  function cellValue(tr) {
+    var cell = tr.children[cellIndex];
+    var text = (cell.textContent || '').trim();
+    var cleaned = text.replace(/[$,%]/g, '');
+    var num = parseFloat(cleaned);
+    var isNumeric = cleaned !== '' && !isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleaned);
+    return isNumeric ? num : text.toLowerCase();
+  }
+
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  rows.sort(function (a, b) {
+    var av = cellValue(a), bv = cellValue(b);
+    if (typeof av === 'number' && typeof bv === 'number') {
+      return nextDir === 'asc' ? av - bv : bv - av;
+    }
+    av = String(av); bv = String(bv);
+    return nextDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(function (r) { tbody.appendChild(r); });
+}
+</script><script src="https://cdn.plot.ly/plotly-3.7.0.min.js"></script><script>
+    const fhPlotlyRegisterOnClick = (plotId, hxPostEndpoint, hxTarget) => {
+        const plotlyPlot = document.getElementById(plotId);
+        plotlyPlot.on('plotly_click', (data) => {
+            const point = data.points[0];
+            const x = point.x;
+            const y = point.y;
+            const payload = new FormData();
+            payload.append('x', x);
+            payload.append('y', y);
+            payload.append('plot_id', plotId);
+            htmx.ajax("POST", hxPostEndpoint, {values: payload, target: hxTarget});
+        });
+    };
+    </script>  </head>
+  <body>
+<div style="background:#eef2ff;border-bottom:1px solid #c7d2fe;padding:10px 16px;text-align:center;font-size:13px;font-family:system-ui,-apple-system,sans-serif;">
+  📊 Static demo with synthetic sample data — not your real purchases. Live search and file upload are disabled here.
+  <a href="https://github.com/parmsam/costco-purchases" style="color:#4338ca;font-weight:600;">Run it yourself →</a>
+</div>
+<main class="container">      <div class="mb-8">
+        <nav class="monster-navbar flex flex-wrap items-center justify-between w-full px-4 py-2.5 border-b border-border/60 backdrop-blur bg-background/95  sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
+          <div class="flex justify-start items-center gap-2">
+<uk-icon icon="shopping-cart" height="20" width="20" class="text-primary"></uk-icon>            <div class="font-bold text-lg">Costco Purchases</div>
+          </div>
+<button aria-controls="mobile-menu" type="button" data-uk-toggle="target: #mobile-menu; cls: hidden" class="md:hidden inline-flex items-center justify-center uk-rounded focus:outline-none focus:ring-2 p-2"><span class="sr-only">Open main menu</span><uk-icon icon="menu" height="24" width="24" class="size-6"></uk-icon></button>          <div id="mobile-menu" class="hidden mt-2 md:mt-0 w-full md:block md:w-auto ">
+            <div class="flex gap-3 flex-col items-end md:flex-row md:items-center md:gap-3">
+<a href="dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layout-dashboard" height="16" width="16"></uk-icon>Dashboard</a><a href="trends.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="trending-up" height="16" width="16"></uk-icon>Trends</a><a href="items.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="shopping-cart" height="16" width="16"></uk-icon>Items</a><a href="warehouses.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="warehouse" height="16" width="16"></uk-icon>Warehouses</a><a href="departments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layers" height="16" width="16"></uk-icon>Departments</a><a href="payments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="credit-card" height="16" width="16"></uk-icon>Payments</a><a href="upload.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="upload" height="16" width="16"></uk-icon>Upload</a><button onclick="cycleTheme()" type="button" id="theme-toggle-btn" class="uk-btn uk-btn-ghost rounded-full px-2" title="Toggle theme (system / light / dark)" name="theme-toggle-btn"><uk-icon icon="monitor" height="16" width="16" id="theme-toggle-icon"></uk-icon></button>            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="container mx-auto px-4 pb-16 max-w-6xl">
+        <div class="mb-6">
+          <div class="flex justify-start items-center gap-2.5">
+<uk-icon icon="receipt" height="26" width="26" class="text-primary"></uk-icon>            <h2 class="uk-h2 font-bold">Receipt</h2>
+          </div>
+          <p class="text-gray-500 dark:text-gray-200 text-sm mt-1.5">Wednesday, August 12, 2026</p>
+        </div>
+        <style>
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+}
+</style>
+        <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 max-w-sm mx-auto">
+<a href="dashboard.html" class="text-sm flex items-center gap-1.5 text-muted-foreground hover:text-primary"><uk-icon icon="arrow-left" height="16" width="16"></uk-icon>Back to Dashboard</a><button onclick="window.print()" type="submit" class="uk-btn uk-btn-primary flex items-center gap-1.5"><uk-icon icon="printer" height="16" width="16"></uk-icon>Print Receipt</button>        </div>
+        <div class="uk-card max-w-sm mx-auto p-6 font-mono bg-white text-neutral-900 shadow-xl ring-1 ring-black/10">
+          <div class="uk-card-body space-y-6">
+            <div class="mb-4">
+              <div class="text-3xl font-black tracking-tight text-center">COSTCO</div>
+              <div class="text-sm font-bold tracking-[0.3em] text-center border-t-2 border-b-2 border-black py-0.5 mt-0.5">WHOLESALE</div>
+            </div>
+            <div class="text-sm font-bold text-center">DEMO CITY #101</div>
+            <div class="text-xs text-center text-neutral-500">DEMO CITY, OH</div>
+            <div class="flex h-14 mx-auto my-3" style="width:fit-content;">
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:2px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:4px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:#000;flex-shrink:0;"></div>
+              <div style="width:6px;align-self:stretch;background:transparent;flex-shrink:0;"></div>
+            </div>
+            <div class="text-xs text-center tracking-widest text-neutral-500 mb-3">101100059260812</div>
+            <div class="text-xs mb-1">Member 111122223333</div>
+            <div class="border-t border-neutral-300 pt-1">
+              <div class="flex text-xs py-0.5">
+<span class="w-16 shrink-0 text-right">100591</span><span class="flex-1 px-2 truncate">KS OLIVE OIL</span><span class="w-16 shrink-0 text-right">17.99</span><span class="w-4 shrink-0 text-right">N</span>              </div>
+              <div class="flex text-xs py-0.5">
+<span class="w-16 shrink-0 text-right">100592</span><span class="flex-1 px-2 truncate">LAUNDRY DETERGENT</span><span class="w-16 shrink-0 text-right">19.99</span><span class="w-4 shrink-0 text-right">Y</span>              </div>
+              <div class="flex text-xs py-0.5">
+<span class="w-16 shrink-0 text-right">900592</span><span class="flex-1 px-2 truncate italic text-neutral-500">/ 100592</span><span class="w-16 shrink-0 text-right">4.50-</span><span class="w-4 shrink-0 text-right"></span>              </div>
+              <div class="flex text-xs py-0.5">
+<span class="w-16 shrink-0 text-right">100593</span><span class="flex-1 px-2 truncate">PROTEIN BARS 20CT</span><span class="w-16 shrink-0 text-right">16.99</span><span class="w-4 shrink-0 text-right">N</span>              </div>
+            </div>
+            <div class="border-t border-dashed border-neutral-400 my-3"></div>
+            <div class="flex text-xs py-0.5 ">
+<span class="flex-1">SUBTOTAL</span><span class="w-20 shrink-0 text-right">50.47</span>            </div>
+            <div class="flex text-xs py-0.5 ">
+<span class="flex-1">TAX</span><span class="w-20 shrink-0 text-right">1.40</span>            </div>
+            <div class="flex text-sm items-center py-1">
+<span class="flex-1 font-bold">TOTAL</span><span class="w-20 shrink-0 text-right font-bold bg-black text-white px-1 rounded">51.87</span>            </div>
+            <div class="border-t border-dashed border-neutral-400 my-3"></div>
+            <div class="mb-2">
+              <div class="flex text-xs py-0.5 ">
+<span class="flex-1">Shop Card</span><span class="w-20 shrink-0 text-right">51.87</span>              </div>
+            </div>
+            <div class="border-t border-dashed border-neutral-400 my-3"></div>
+            <div class="flex text-xs py-0.5 ">
+<span class="flex-1">TOTAL TAX</span><span class="w-20 shrink-0 text-right">1.40</span>            </div>
+            <div class="flex text-xs py-0.5 ">
+<span class="flex-1">ITEMS SOLD</span><span class="w-20 shrink-0 text-right">3</span>            </div>
+            <div class="flex text-xs py-0.5 font-bold">
+<span class="flex-1">INSTANT SAVINGS</span><span class="w-20 shrink-0 text-right">4.50</span>            </div>
+            <div class="text-xs text-center font-bold bg-black text-white rounded px-1 py-0.5 mt-2 w-fit mx-auto">08/12/2026 14:33</div>
+            <div class="border-t border-dashed border-neutral-400 my-3"></div>
+            <div class="text-sm text-center font-semibold">Thank You!</div>
+            <div class="text-sm text-center mb-3">Please Come Again</div>
+            <div class="text-xs text-center text-neutral-500">Whse: 101   Trm: 228   Trn: 936   Opt: 379</div>
+            <div class="border-t border-dashed border-neutral-400 mt-3 mb-2"></div>
+            <div class="text-[10px] text-center text-neutral-400 italic leading-snug">Reconstructed from your archived purchase history — not an official Costco receipt.</div>
+          </div>
+        </div>
+      </div>
+</main>  </body>
+</html>
