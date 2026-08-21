@@ -11,12 +11,13 @@ from dashboard.analytics.receipt import get_receipt
 from dashboard.analytics.trends import monthly_spend
 from dashboard.charts import chart_card
 from dashboard.components import empty_state, kpi_card, kpi_row, limit_select, section
-from dashboard.data.store import get_upload_history
+from dashboard.data.normalize import item_label
+from dashboard.data.store import get_item_labels, get_upload_history
 from dashboard.layout import page
 from dashboard.palette import SINGLE_SERIES
 
 
-def _receipt_accordion_item(receipt: dict):
+def _receipt_accordion_item(receipt: dict, item_labels: dict):
     when = receipt.get("transaction_date")
     date_str = f"{when:%Y-%m-%d}" if when is not None else ""
 
@@ -30,7 +31,11 @@ def _receipt_accordion_item(receipt: dict):
     item_rows = [
         Div(
             Span(
-                item.get("item_description_primary") or item.get("item_description") or "",
+                item_label(
+                    item.get("item_number"),
+                    item.get("item_description_primary") or item.get("item_description"),
+                    item_labels,
+                ),
                 cls="flex-1 truncate",
             ),
             Span(f"${item['amount']:,.2f}" if item.get("amount") is not None else "", cls="w-20 text-right shrink-0"),
@@ -106,11 +111,12 @@ def register_overview_routes(rt):
         fig.update_traces(marker_color=SINGLE_SERIES, marker_line_width=0)
         trend_chart = chart_card(fig)
 
+        item_labels = get_item_labels()
         sorted_ids = receipts_df.sort_values("transaction_date", ascending=False)["receipt_id"]
         recent_ids = sorted_ids if limit == 0 else sorted_ids.head(limit)
         recent_receipts = [get_receipt(receipts_df, items_df, tenders_df, rid) for rid in recent_ids]
         recent_accordion = Accordion(
-            *[_receipt_accordion_item(r) for r in recent_receipts if r is not None],
+            *[_receipt_accordion_item(r, item_labels) for r in recent_receipts if r is not None],
             multiple=True,
         )
         recent_count_control = limit_select(

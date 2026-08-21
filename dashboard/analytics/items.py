@@ -27,6 +27,23 @@ def top_items_by_frequency(items_df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     return grouped.sort_values("purchase_count", ascending=False).head(n)
 
 
+def distinct_items(items_df: pd.DataFrame, n: int = 50) -> pd.DataFrame:
+    """One row per item_number (raw description + total spend), for the
+    'Manage Item Names' editor — sorted by spend so the items worth naming
+    are easy to find first. item_number isn't unique-per-row (discount
+    lines reuse the linked item's number), so this only considers real
+    purchase rows.
+    """
+    if items_df.empty:
+        return pd.DataFrame(columns=["item_number", "item_description", "total_spend"])
+    real = _exclude_discounts(items_df).dropna(subset=["item_number"])
+    grouped = real.groupby("item_number", as_index=False).agg(
+        item_description=("item_description", "first"),
+        total_spend=("amount", "sum"),
+    )
+    return grouped.sort_values("total_spend", ascending=False).head(n)
+
+
 def filter_items(items_df: pd.DataFrame, receipts_df: pd.DataFrame, search: str = "") -> pd.DataFrame:
     merged = items_df.merge(
         receipts_df[["receipt_id", "transaction_date", "warehouse_name"]],
