@@ -38,6 +38,12 @@ The original JSON/CSV file you downloaded isn't kept or referenced afterward —
 
 Re-uploading the same export is safe (rows are deduped); re-uploading a newer export only adds the delta.
 
+### Why re-uploads merge instead of replace
+
+Each upload is merged into the existing Parquet store, not swapped in for it: old and new rows are combined, then deduped by a stable key (`receipt_id` for receipts, `receipt_id + line_no` for items, `receipt_id + tender_type_name + amount_tender` for tenders), keeping the newer version whenever a row exists in both.
+
+This matters because the downloader always re-fetches Costco's full ~3-year lookback window from scratch on every run — it isn't incremental. A receipt older than 3 years is simply absent from a fresh download. If uploads replaced the store instead of merging, every re-upload would silently drop whatever had aged out of that window. Because they merge, a receipt stays in your local store permanently once captured, even after Costco's own API has forgotten it.
+
 ## Tests
 
 ```bash
