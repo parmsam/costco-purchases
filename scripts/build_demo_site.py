@@ -18,7 +18,7 @@ from pathlib import Path
 PAGES = ["dashboard", "trends", "items", "warehouses", "departments", "payments", "upload"]
 
 BANNER = """
-<div style="background:#eef2ff;border-bottom:1px solid #c7d2fe;padding:10px 16px;text-align:center;font-size:13px;font-family:system-ui,-apple-system,sans-serif;">
+<div style="background:#eef2ff;border-bottom:1px solid #c7d2fe;padding:10px 16px;text-align:center;font-size:13px;font-family:system-ui,-apple-system,sans-serif;color:#312e81;">
   📊 Static demo with synthetic sample data — not your real purchases. Live search and file upload are disabled here.
   <a href="https://github.com/parmsam/costco-purchases" style="color:#4338ca;font-weight:600;">Run it yourself →</a>
 </div>
