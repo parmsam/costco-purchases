@@ -2,22 +2,71 @@
 
 import plotly.express as px
 
-from monsterui.franken import A
+from fasthtml.common import Div, Span
+from monsterui.franken import A, Accordion, AccordionItem
 
 from dashboard.analytics.filters import load_filtered
 from dashboard.analytics.kpis import compute_kpis
+from dashboard.analytics.receipt import get_receipt
 from dashboard.analytics.trends import monthly_spend
 from dashboard.charts import chart_card
-from dashboard.components import empty_state, kpi_card, kpi_row, section, sortable_table
+from dashboard.components import empty_state, kpi_card, kpi_row, section
 from dashboard.data.store import get_upload_history
 from dashboard.layout import page
 from dashboard.palette import SINGLE_SERIES
 
 
+def _receipt_accordion_item(receipt: dict):
+    when = receipt.get("transaction_date")
+    date_str = f"{when:%Y-%m-%d}" if when is not None else ""
+
+    title = Div(
+        Span(date_str, cls="w-24 shrink-0 text-sm"),
+        Span(receipt.get("warehouse_name") or "", cls="flex-1 text-sm text-left truncate"),
+        Span(f"${receipt['total']:,.2f}", cls="w-20 shrink-0 text-right text-sm font-semibold"),
+        cls="flex items-center gap-4 flex-1 pr-2",
+    )
+
+    item_rows = [
+        Div(
+            Span(
+                item.get("item_description_primary") or item.get("item_description") or "",
+                cls="flex-1 truncate",
+            ),
+            Span(f"${item['amount']:,.2f}" if item.get("amount") is not None else "", cls="w-20 text-right shrink-0"),
+            cls="flex text-sm py-0.5 text-muted-foreground",
+        )
+        for item in receipt.get("items", [])
+        if not item.get("is_discount")
+    ]
+
+    savings = receipt.get("instant_savings")
+    tenders = receipt.get("tenders", [])
+    tender_line = ", ".join(
+        f"{t.get('tender_type_name')} ${t.get('amount_tender'):,.2f}"
+        for t in tenders
+        if t.get("tender_type_name") is not None
+    )
+
+    content = Div(
+        *item_rows,
+        Div(f"Instant Savings: ${savings:,.2f}", cls="text-xs text-primary mt-2") if savings else "",
+        Div(tender_line, cls="text-xs text-muted-foreground mt-1") if tender_line else "",
+        A(
+            "View Full Receipt →",
+            href=f"/receipt/{receipt['receipt_id']}",
+            cls="text-xs text-primary hover:underline mt-2 inline-block",
+        ),
+        cls="pt-2 pb-3",
+    )
+
+    return AccordionItem(title, content)
+
+
 def register_overview_routes(rt):
     @rt("/dashboard")
     def get(start: str = "", end: str = ""):
-        receipts_df, items_df, _, filter_bar = load_filtered("/dashboard", start, end)
+        receipts_df, items_df, tenders_df, filter_bar = load_filtered("/dashboard", start, end)
 
         if filter_bar is None:
             return page(
@@ -57,28 +106,18 @@ def register_overview_routes(rt):
         fig.update_traces(marker_color=SINGLE_SERIES, marker_line_width=0)
         trend_chart = chart_card(fig)
 
-        recent = receipts_df.sort_values("transaction_date", ascending=False).head(10)
-        recent_table = sortable_table(
-            header_data=["Date", "Warehouse", "Total"],
-            body_data=[
-                {
-                    "Date": A(
-                        f"{row.transaction_date:%Y-%m-%d}" if row.transaction_date is not None else "",
-                        href=f"/receipt/{row.receipt_id}",
-                        cls="text-primary hover:underline",
-                    ),
-                    "Warehouse": row.warehouse_name,
-                    "Total": f"${row.total:,.2f}",
-                }
-                for row in recent.itertuples()
-            ],
+        recent_ids = receipts_df.sort_values("transaction_date", ascending=False)["receipt_id"].head(10)
+        recent_receipts = [get_receipt(receipts_df, items_df, tenders_df, rid) for rid in recent_ids]
+        recent_accordion = Accordion(
+            *[_receipt_accordion_item(r) for r in recent_receipts if r is not None],
+            multiple=True,
         )
 
         return page(
             "Dashboard",
             cards,
             section("Monthly Spend", trend_chart, icon="bar-chart-3"),
-            section("Recent Receipts", recent_table, icon="clock"),
+            section("Recent Receipts", recent_accordion, icon="clock"),
             active="/dashboard",
             subtitle=subtitle,
             filter_bar=filter_bar,
