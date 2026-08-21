@@ -1,6 +1,6 @@
 """Shared page shell + navigation bar."""
 
-from fasthtml.common import Div, Script, Style, Titled
+from fasthtml.common import Div, Main, Script, Style, Title
 from monsterui.core import Theme, ThemeRadii
 from monsterui.franken import A, Button, ButtonT, DivLAligned, NavBar, Subtitle, UkIcon, H2
 
@@ -156,14 +156,21 @@ def page(title: str, *content, active: str = "", subtitle: str = "", filter_bar=
         Subtitle(subtitle) if subtitle else "",
         cls="mb-6",
     )
-    return Titled(
-        title,
-        Div(nav_bar(active), cls="mb-8"),
-        Div(
-            header,
-            filter_bar if filter_bar is not None else "",
-            *content,
-            cls="container mx-auto px-4 pb-16 max-w-6xl",
+    # Title(title) sets the actual browser-tab name. Deliberately not using
+    # fasthtml's Titled() here — it also injects an unstyled <h1>{title}</h1>
+    # as the very first element on the page, above the nav bar, duplicating
+    # the styled H2+icon title below.
+    return (
+        Title(title),
+        Main(
+            Div(nav_bar(active), cls="mb-8"),
+            Div(
+                header,
+                filter_bar if filter_bar is not None else "",
+                *content,
+                cls="container mx-auto px-4 pb-16 max-w-6xl",
+            ),
+            cls="container",
         ),
     )
 
