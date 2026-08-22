@@ -469,17 +469,29 @@
     URL.revokeObjectURL(url);
   }
 
-  function downloadJSON(receipts) {
+  // Local time, not UTC - the timestamp is for the user glancing at their
+  // downloads folder, not for machine parsing. Colon-free (HH-mm-ss) since
+  // ':' isn't a legal filename character on Windows.
+  function timestampSuffix() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return (
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+      `_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`
+    );
+  }
+
+  function downloadJSON(receipts, suffix) {
     return saveFile(
       JSON.stringify({ exportedAt: new Date().toISOString(), receipts }, null, 2),
-      'costco-receipts.json',
+      `costco-receipts-${suffix}.json`,
       'application/json'
     );
   }
 
-  async function downloadCSV(receipts) {
-    await saveFile(toItemLevelCSV(receipts), 'costco-receipts-items.csv', 'text/csv');
-    await saveFile(toReceiptLevelCSV(receipts), 'costco-receipts.csv', 'text/csv');
+  async function downloadCSV(receipts, suffix) {
+    await saveFile(toItemLevelCSV(receipts), `costco-receipts-items-${suffix}.csv`, 'text/csv');
+    await saveFile(toReceiptLevelCSV(receipts), `costco-receipts-${suffix}.csv`, 'text/csv');
   }
 
   // ---------------------------------------------------------------------
@@ -580,6 +592,12 @@
     const existingPanel = document.getElementById('costco-rd-panel');
     if (existingPanel) existingPanel.remove();
 
+    // Computed once here (not inside downloadJSON/downloadCSV) so the JSON
+    // and both CSV files from a single click - including "Download Both" -
+    // always share one timestamp, even if a save-file-picker dialog delays
+    // one of the saves into the next second.
+    const suffix = timestampSuffix();
+
     const panel = document.createElement('div');
     panel.id = 'costco-rd-panel';
     panel.style.cssText = [
@@ -599,11 +617,11 @@
 
     document.body.appendChild(panel);
 
-    document.getElementById('costco-rd-save-json').addEventListener('click', () => downloadJSON(receipts));
-    document.getElementById('costco-rd-save-csv').addEventListener('click', () => downloadCSV(receipts));
+    document.getElementById('costco-rd-save-json').addEventListener('click', () => downloadJSON(receipts, suffix));
+    document.getElementById('costco-rd-save-csv').addEventListener('click', () => downloadCSV(receipts, suffix));
     document.getElementById('costco-rd-save-both').addEventListener('click', async () => {
-      await downloadJSON(receipts);
-      await downloadCSV(receipts);
+      await downloadJSON(receipts, suffix);
+      await downloadCSV(receipts, suffix);
     });
   }
 
