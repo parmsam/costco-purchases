@@ -104,6 +104,7 @@ def register_overview_routes(rt):
                 icon="badge-percent",
             ),
             kpi_card("Avg Items/Receipt", f"{k['avg_items_per_receipt']:.1f}", icon="package"),
+            kpi_card("Unique Items", f"{k['unique_items']:,}", icon="scan-barcode"),
         )
 
         trend_df = monthly_spend(receipts_df)

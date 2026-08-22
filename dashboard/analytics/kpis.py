@@ -35,7 +35,10 @@ def compute_kpis(receipts_df: pd.DataFrame, items_df: pd.DataFrame | None = None
     if items_df is not None and not items_df.empty and "is_discount" in items_df.columns:
         discount_rows = items_df[items_df["is_discount"].fillna(False)]
         kpis["instant_savings_line_items"] = -discount_rows["amount"].sum()
+        real_items = items_df[~items_df["is_discount"].fillna(False)]
+        kpis["unique_items"] = int(real_items["item_number"].dropna().nunique())
     else:
         kpis["instant_savings_line_items"] = 0.0
+        kpis["unique_items"] = 0
 
     return kpis
