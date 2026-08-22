@@ -4,8 +4,10 @@
  * Usage:
  *   1. Log in to costco.com and navigate to Orders & Purchases -> In-Warehouse.
  *   2. Open devtools -> Console, paste this entire script, press Enter.
- *   3. Click "Load Existing Receipt File" (to merge/dedup against a previous
- *      export) or "Start Fresh (No File)".
+ *   3. Optionally narrow the From/To date range (defaults to Costco's full
+ *      ~3-year lookback - narrower is faster if you don't need it all),
+ *      then click "Load Existing Receipt File" (to merge/dedup against a
+ *      previous export) or "Start Fresh (No File)".
  *   4. When fetching completes, choose Download JSON / Download CSV / Download Both.
  *
  * This is a personal-data archiving tool for the logged-in account owner.
@@ -498,9 +500,16 @@
   // UI — step 1: load-existing-file / start-fresh prompt
   // ---------------------------------------------------------------------
 
-  function getExistingReceipts() {
+  // Resolves { existingReceipts, startDate, endDate }. Date inputs are
+  // pre-filled with maxDateRange()'s full lookback window and left as-is
+  // by default; narrowing them makes the fetch faster (fewer receipts, and
+  // fewer per-barcode gas station detail calls - see
+  // fetchGasStationReceipts) at the cost of only covering that window.
+  function getDownloadOptions() {
     return new Promise((resolve) => {
       let resolved = false;
+      const defaults = maxDateRange();
+
       const container = document.createElement('div');
       container.id = 'costco-rd-prompt';
       Object.assign(container.style, {
@@ -509,8 +518,36 @@
         right: '20px',
         zIndex: '999999',
         display: 'flex',
+        flexDirection: 'column',
         gap: '10px',
+        background: '#fff',
+        color: '#111',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        padding: '14px',
+        width: '300px',
+        font: '13px/1.4 -apple-system,Segoe UI,Roboto,sans-serif',
       });
+
+      container.innerHTML = `
+        <div style="font-weight:600;">Costco Receipt Downloader</div>
+        <div style="display:flex;gap:8px;">
+          <label style="flex:1;">From<br>
+            <input id="costco-rd-start" type="date" value="${defaults.startDate}"
+                   min="${defaults.startDate}" max="${defaults.endDate}" style="width:100%;">
+          </label>
+          <label style="flex:1;">To<br>
+            <input id="costco-rd-end" type="date" value="${defaults.endDate}"
+                   min="${defaults.startDate}" max="${defaults.endDate}" style="width:100%;">
+          </label>
+        </div>
+        <div style="color:#666;font-size:11px;">Narrower range = faster download. Defaults to Costco's full ~3-year history.</div>
+      `;
+
+      const buttonRow = document.createElement('div');
+      buttonRow.style.display = 'flex';
+      buttonRow.style.gap = '10px';
 
       const loadBtn = document.createElement('button');
       loadBtn.textContent = 'Load Existing Receipt File';
@@ -536,12 +573,19 @@
         fontSize: '14px',
       });
 
-      const finish = (receipts) => {
+      const finish = (existingReceipts) => {
         if (resolved) return;
         resolved = true;
         clearTimeout(timeoutId);
+
+        const startInput = document.getElementById('costco-rd-start');
+        const endInput = document.getElementById('costco-rd-end');
+        let startDate = (startInput && startInput.value) || defaults.startDate;
+        let endDate = (endInput && endInput.value) || defaults.endDate;
+        if (startDate > endDate) [startDate, endDate] = [endDate, startDate]; // guard against a manually-typed inverted range
+
         container.remove();
-        resolve(receipts);
+        resolve({ existingReceipts, startDate, endDate });
       };
 
       freshBtn.addEventListener('click', () => {
@@ -573,8 +617,9 @@
         input.click();
       });
 
-      container.appendChild(loadBtn);
-      container.appendChild(freshBtn);
+      buttonRow.appendChild(loadBtn);
+      buttonRow.appendChild(freshBtn);
+      container.appendChild(buttonRow);
       document.body.appendChild(container);
 
       const timeoutId = setTimeout(() => {
@@ -636,9 +681,7 @@
     const auth = validateTokens();
     console.log('Authentication tokens found.');
 
-    const existingReceipts = await getExistingReceipts();
-
-    const { startDate, endDate } = maxDateRange();
+    const { existingReceipts, startDate, endDate } = await getDownloadOptions();
     console.log(`Fetching receipts from ${startDate} to ${endDate}...`);
 
     let incoming;
