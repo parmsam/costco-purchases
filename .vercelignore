@@ -1,0 +1,12 @@
+data/
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+tests/
+scripts/
+downloader/
+docs/
+.sesskey
+.DS_Store
+PLAN.md

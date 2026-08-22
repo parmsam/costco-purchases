@@ -7,21 +7,41 @@ scale — no need for incremental/transactional writes.
 
 SQLite (data/dashboard.db, via fastlite) holds small mutable metadata:
 upload_history and department_labels.
+
+This disk-backed implementation is what runs locally. The publicly-linked
+Vercel demo needs the opposite properties - no shared disk, no data that
+outlives a visitor - so every public function below first checks EPHEMERAL
+and, if set, delegates to _memory_store instead (see that module for the
+per-visitor, in-memory implementation). EPHEMERAL is on automatically under
+`vercel dev`/deploy (Vercel sets VERCEL=1) or when DASHBOARD_EPHEMERAL is
+set by hand; it's off in local dev and in this file's own test suite, so
+the disk code path below is unchanged from before the ephemeral backend
+existed.
 """
 
+import os
 from pathlib import Path
 
 import pandas as pd
 from fastlite import database
 
+from dashboard.data import _memory_store
 from dashboard.data.normalize import normalize_all
 from dashboard.data.schema import empty_frame, ITEMS_COLUMNS, RECEIPTS_COLUMNS, TENDERS_COLUMNS
+
+EPHEMERAL = bool(os.environ.get("VERCEL") or os.environ.get("DASHBOARD_EPHEMERAL"))
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 RECEIPTS_PATH = DATA_DIR / "receipts.parquet"
 ITEMS_PATH = DATA_DIR / "items.parquet"
 TENDERS_PATH = DATA_DIR / "tenders.parquet"
 DB_PATH = DATA_DIR / "dashboard.db"
+
+
+def set_session_id(sid: str) -> None:
+    """No-op locally (single-user disk store); scopes _memory_store when EPHEMERAL."""
+    if EPHEMERAL:
+        _memory_store.set_session_id(sid)
 
 
 def _ensure_data_dir():
@@ -35,6 +55,8 @@ def _read_parquet_or_empty(path: Path, columns: dict) -> pd.DataFrame:
 
 
 def load_all() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    if EPHEMERAL:
+        return _memory_store.load_all()
     _ensure_data_dir()
     receipts_df = _read_parquet_or_empty(RECEIPTS_PATH, RECEIPTS_COLUMNS)
     items_df = _read_parquet_or_empty(ITEMS_PATH, ITEMS_COLUMNS)
@@ -53,6 +75,8 @@ def merge_and_save(
 
     Returns counts of rows added (post-dedup delta) for the upload_history log.
     """
+    if EPHEMERAL:
+        return _memory_store.merge_and_save(new_receipts, new_items, new_tenders)
     _ensure_data_dir()
 
     new_receipts, new_items, new_tenders = normalize_all(new_receipts, new_items, new_tenders)
@@ -118,6 +142,9 @@ def get_db():
 
 
 def record_upload(filename: str, format: str, receipts_added: int, items_added: int):
+    if EPHEMERAL:
+        return _memory_store.record_upload(filename, format, receipts_added, items_added)
+
     from datetime import datetime, timezone
 
     db = get_db()
@@ -131,26 +158,36 @@ def record_upload(filename: str, format: str, receipts_added: int, items_added: 
 
 
 def get_upload_history() -> list[dict]:
+    if EPHEMERAL:
+        return _memory_store.get_upload_history()
     db = get_db()
     return list(db.t.upload_history(order_by="-id"))
 
 
 def get_department_labels() -> dict:
+    if EPHEMERAL:
+        return _memory_store.get_department_labels()
     db = get_db()
     return {row["dept_number"]: row["custom_label"] for row in db.t.department_labels()}
 
 
 def set_department_label(dept_number: str, custom_label: str):
+    if EPHEMERAL:
+        return _memory_store.set_department_label(dept_number, custom_label)
     db = get_db()
     db.t.department_labels.upsert(dept_number=dept_number, custom_label=custom_label)
 
 
 def get_item_labels() -> dict:
+    if EPHEMERAL:
+        return _memory_store.get_item_labels()
     db = get_db()
     return {row["item_number"]: row["custom_label"] for row in db.t.item_labels()}
 
 
 def set_item_label(item_number: str, custom_label: str):
+    if EPHEMERAL:
+        return _memory_store.set_item_label(item_number, custom_label)
     db = get_db()
     if custom_label:
         db.t.item_labels.upsert(item_number=item_number, custom_label=custom_label)
