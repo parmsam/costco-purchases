@@ -16,6 +16,11 @@
  * GraphQL variables) gets rejected with a 403 by Costco's API gateway
  * before it ever reaches the resolver.
  *
+ * Covers in-warehouse merchandise AND gas station receipts (fetched via a
+ * separate summary + per-barcode detail call — see graphqlRequest and
+ * fetchGasStationReceipts below). Online orders (the "Online" tab) are a
+ * different data shape entirely and are not fetched by this script.
+ *
  * Query/header shape adapted from TechStud/TCRDD
  * (https://github.com/TechStud/TCRDD), which reverse-engineered the real
  * request Costco's Orders & Purchases page sends.
@@ -110,7 +115,15 @@
     }
   `;
 
-  async function listReceipts(auth, startDate, endDate) {
+  // receipts(startDate, endDate) only ever returns in-warehouse merchandise
+  // receipts — gas station transactions are silently absent from it, not
+  // just thinly detailed. Costco's own Orders & Purchases page gets gas
+  // receipts via a second, per-receipt call: a receiptsWithCounts(startDate,
+  // endDate, documentType:"all", documentSubType:"all") summary pass (which
+  // also reports category counts) to find gas station barcodes, then one
+  // receiptsWithCounts(barcode, documentType:"fuel") call per barcode for
+  // the full itemized detail. See fetchGasStationReceipts() below.
+  async function graphqlRequest(auth, query, variables) {
     const headers = {
       'Content-Type': 'application/json',
       'Costco.Env': 'ecom',
@@ -120,10 +133,7 @@
       'Costco-X-Authorization': `Bearer ${auth.idToken}`,
     };
 
-    const body = JSON.stringify({
-      query: LIST_RECEIPTS_QUERY.replace(/\s+/g, ' '),
-      variables: { startDate, endDate },
-    });
+    const body = JSON.stringify({ query: query.replace(/\s+/g, ' '), variables });
 
     const resp = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
@@ -146,12 +156,148 @@
     if (json.errors && json.errors.length) {
       throw new Error(`Costco GraphQL errors: ${JSON.stringify(json.errors)}`);
     }
+    return json.data;
+  }
 
-    const receipts = json.data && json.data.receipts;
+  async function listReceipts(auth, startDate, endDate) {
+    const data = await graphqlRequest(auth, LIST_RECEIPTS_QUERY, { startDate, endDate });
+    const receipts = data && data.receipts;
     if (!Array.isArray(receipts)) {
       throw new Error('Costco GraphQL response did not contain the expected receipts array.');
     }
     return receipts;
+  }
+
+  const RECEIPT_SUMMARY_QUERY = `
+    query receiptsWithCounts($startDate: String!, $endDate: String!, $documentType: String!, $documentSubType: String!) {
+      receiptsWithCounts(startDate: $startDate, endDate: $endDate, documentType: $documentType, documentSubType: $documentSubType) {
+        inWarehouse
+        gasStation
+        carWash
+        gasAndCarWash
+        receipts {
+          receiptType
+          documentType
+          membershipNumber
+          transactionBarcode
+        }
+      }
+    }
+  `;
+
+  // Same field selection as LIST_RECEIPTS_QUERY above, so a gas station
+  // receipt fetched this way slots into the merged receipts array with
+  // exactly the same shape as a warehouse one — nothing downstream (merge,
+  // CSV/JSON export, dashboard parser) needs to know it came from a
+  // different query.
+  const RECEIPT_DETAIL_QUERY = `
+    query receiptsWithCounts($barcode: String!, $documentType: String!) {
+      receiptsWithCounts(barcode: $barcode, documentType: $documentType) {
+        receipts {
+          documentType
+          receiptType
+          membershipNumber
+          transactionType
+          transactionDateTime
+          transactionDate
+          warehouseShortName
+          warehouseNumber
+          warehouseName
+          warehouseCity
+          warehouseState
+          warehouseAddress1
+          warehouseAddress2
+          warehousePostalCode
+          transactionBarcode
+          totalItemCount
+          instantSavings
+          subTotal
+          taxes
+          total
+          registerNumber
+          transactionNumber
+          operatorNumber
+          itemArray {
+            itemNumber
+            itemDescription01
+            itemDescription02
+            itemDepartmentNumber
+            itemUnitPriceAmount
+            unit
+            amount
+            taxFlag
+            refundFlag
+            voidFlag
+            entryMethod
+            fuelUnitQuantity
+            fuelUomCode
+            fuelGradeCode
+          }
+          couponArray {
+            couponNumber
+            associatedItemNumber
+            amountCoupon
+          }
+          tenderArray {
+            tenderTypeName
+            amountTender
+            walletType
+            displayAccountNumber
+            approvalNumber
+            entryMethod
+          }
+        }
+      }
+    }
+  `;
+
+  async function fetchReceiptDetail(auth, barcode, documentType) {
+    const data = await graphqlRequest(auth, RECEIPT_DETAIL_QUERY, { barcode, documentType });
+    const receipts = data && data.receiptsWithCounts && data.receiptsWithCounts.receipts;
+    return Array.isArray(receipts) && receipts.length ? receipts[0] : null;
+  }
+
+  // Finds gas station receipts in the date range and fetches full itemized
+  // detail for each. Best-effort: on failure this logs a warning and
+  // returns [] rather than throwing, so a summary-query hiccup doesn't take
+  // down the (already-working) warehouse-receipt fetch it runs alongside.
+  async function fetchGasStationReceipts(auth, startDate, endDate) {
+    let summary;
+    try {
+      const data = await graphqlRequest(auth, RECEIPT_SUMMARY_QUERY, {
+        startDate,
+        endDate,
+        documentType: 'all',
+        documentSubType: 'all',
+      });
+      summary = data && data.receiptsWithCounts;
+    } catch (err) {
+      console.warn('Gas station receipt lookup failed (continuing without them):', err);
+      return [];
+    }
+    if (!summary) return [];
+
+    console.log(
+      `Receipt category counts — in-warehouse: ${summary.inWarehouse}, gas station: ${summary.gasStation}, ` +
+        `car wash: ${summary.carWash}, gas+car wash: ${summary.gasAndCarWash}.`
+    );
+
+    const gasStubs = (summary.receipts || []).filter(
+      (r) => r.receiptType === 'Gas Station' || r.documentType === 'FuelReceipts'
+    );
+    if (!gasStubs.length) return [];
+
+    console.log(`Fetching detail for ${gasStubs.length} gas station receipt(s)...`);
+    const detailed = [];
+    for (const stub of gasStubs) {
+      try {
+        const receipt = await fetchReceiptDetail(auth, stub.transactionBarcode, 'fuel');
+        if (receipt) detailed.push(receipt);
+      } catch (err) {
+        console.warn(`Failed to fetch gas station receipt ${stub.transactionBarcode}:`, err);
+      }
+    }
+    return detailed;
   }
 
   function maxDateRange() {
@@ -486,10 +632,13 @@
       return;
     }
 
-    const merged = mergeReceipts(existingReceipts, incoming);
+    console.log('Checking for gas station receipts (fetched separately - see comment on graphqlRequest)...');
+    const gasStationReceipts = await fetchGasStationReceipts(auth, startDate, endDate);
+
+    const merged = mergeReceipts(existingReceipts, [...incoming, ...gasStationReceipts]);
     logStats(merged);
     console.log(
-      `Done. ${merged.length} receipts ready (${incoming.length} fetched, ${existingReceipts.length} from merge file).`
+      `Done. ${merged.length} receipts ready (${incoming.length} warehouse + ${gasStationReceipts.length} gas station fetched, ${existingReceipts.length} from merge file).`
     );
 
     showDownloadPicker(merged);

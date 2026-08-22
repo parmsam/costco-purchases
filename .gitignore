@@ -7,3 +7,4 @@ __pycache__/
 .sesskey
 .DS_Store
 .vercel
+/.reference/
