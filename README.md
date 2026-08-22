@@ -6,6 +6,15 @@ Everything runs **on your own computer**. Nothing is uploaded anywhere, and no a
 
 ---
 
+## Try it without installing anything
+
+Two hosted options if you just want to look before you install anything locally:
+
+- **[Static demo](https://parmsam.github.io/costco-purchases/)** — pre-loaded sample data, browse-only, no upload. Good for seeing what the dashboard looks like.
+- **[Live demo](https://costco-purchases.vercel.app)** — the real app, upload your own export and click around it for real. Runs on Vercel with a deliberately different storage model from the local version: your data lives only in server memory for that visit, scoped to you (other visitors can't see it), and a re-upload replaces it rather than merging like the local version does. Nothing ever touches disk, and it disappears once your session goes idle — treat it as a place to try the tool, not to keep your purchase history. For that, run it locally (below).
+
+---
+
 ## 🐣 New here? Start here (no coding experience needed)
 
 This walks through the whole thing from a blank computer — about 15 minutes, all copy-and-paste. It assumes nothing except that you can log in to costco.com and open a program called **Terminal** (Mac) or the app store **Windows Terminal** (Windows).

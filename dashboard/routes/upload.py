@@ -4,6 +4,7 @@ import json
 
 from fasthtml.common import Div, Form, P, RedirectResponse, UploadFile
 from monsterui.franken import (
+    A,
     Button,
     ButtonT,
     Card,
@@ -52,22 +53,27 @@ def _upload_page(flash: str | None = None):
         cls="pt-4",
     )
 
+    downloader_link = A(
+        "downloader/costco_receipt_downloader.js",
+        href="https://github.com/parmsam/costco-purchases/blob/main/downloader/costco_receipt_downloader.js",
+        target="_blank",
+        rel="noopener noreferrer",
+        cls="underline text-primary",
+    )
+    step_contents = [
+        "Log in to costco.com and open Orders & Purchases.",
+        P("Paste ", downloader_link, " into the browser console.", cls="text-sm text-muted-foreground"),
+        "Download the JSON (recommended) or CSV export.",
+        "Upload it below.",
+    ]
     steps = Div(
         *[
             DivLAligned(
                 Div(str(n), cls="shrink-0 grid place-items-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold"),
-                P(text, cls="text-sm text-muted-foreground"),
+                P(content, cls="text-sm text-muted-foreground") if isinstance(content, str) else content,
                 cls="gap-3 items-center",
             )
-            for n, text in enumerate(
-                [
-                    "Log in to costco.com and open Orders & Purchases.",
-                    "Paste downloader/costco_receipt_downloader.js into the browser console.",
-                    "Download the JSON (recommended) or CSV export.",
-                    "Upload it below.",
-                ],
-                start=1,
-            )
+            for n, content in enumerate(step_contents, start=1)
         ],
         cls="space-y-2.5 mb-6",
     )

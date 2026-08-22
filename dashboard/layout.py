@@ -260,9 +260,18 @@ def nav_bar(active: str = ""):
         submit=False,
         title="Toggle theme (system / light / dark)",
     )
+    github_link = A(
+        UkIcon("github", height=16, width=16),
+        href="https://github.com/parmsam/costco-purchases",
+        target="_blank",
+        rel="noopener noreferrer",
+        cls=(ButtonT.ghost, "rounded-full px-2 inline-flex items-center"),
+        title="View source on GitHub",
+    )
     return NavBar(
         *links,
         theme_toggle,
+        github_link,
         brand=brand,
         sticky=True,
         cls="px-4 py-2.5 border-b border-border/60 backdrop-blur bg-background/95",
