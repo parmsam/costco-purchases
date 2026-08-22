@@ -61,3 +61,76 @@ def test_kpi_line_item_savings_matches_receipt_level():
     k = compute_kpis(receipts_df, items_df)
     assert k["instant_savings_line_items"] == 5.00
     assert k["total_instant_savings"] == 5.00
+
+
+def test_discount_nets_onto_target_items_spend():
+    _, items_df, _ = normalize_all(*parse_json(RECEIPT_WITH_DISCOUNT))
+    net = items_df.set_index("item_description")["net_amount"]
+    assert net["NIGHT LIGHT NIGHT LIGHT 3PK P216"] == 18.99  # 23.99 gross - 5.00 discount
+    assert net["/ 1937959"] == -5.00  # the discount row's own net_amount is untouched
+
+    top = top_items_by_spend(items_df)
+    row = top[top["item_description"] == "NIGHT LIGHT NIGHT LIGHT 3PK P216"].iloc[0]
+    assert row["total_spend"] == 18.99  # net, not the gross 23.99
+
+
+RECEIPT_WITH_STACKED_AND_UNLABELED_DISCOUNTS = {
+    "receipts": [
+        {
+            "membershipNumber": "111122223333",
+            "transactionDate": "2026-08-15",
+            "transactionBarcode": "EEE555",
+            "warehouseName": "North Canton",
+            "total": 14.98,
+            "subTotal": 19.98,
+            "taxes": 0,
+            "instantSavings": 5.00,
+            "totalItemCount": 1,
+            "itemArray": [
+                {
+                    "itemNumber": "5551212",
+                    "itemDescription01": "KS SNACK MIX",
+                    "itemDepartmentNumber": "14",
+                    "amount": 19.98,
+                    "taxFlag": False,
+                    "refundFlag": False,
+                    "voidFlag": False,
+                },
+                # Stacked: instant savings, then a coupon, both on the same
+                # item above. Second one uses a short non-numeric label
+                # (no item number to parse out) - attribution here is
+                # purely positional, so it must still net correctly.
+                {
+                    "itemNumber": "5551212",
+                    "itemDescription01": "/ 5551212",
+                    "itemDepartmentNumber": "14",
+                    "amount": -3.00,
+                    "taxFlag": False,
+                    "refundFlag": False,
+                    "voidFlag": False,
+                },
+                {
+                    "itemNumber": "5551212",
+                    "itemDescription01": "/SNAPS",
+                    "itemDepartmentNumber": "14",
+                    "amount": -2.00,
+                    "taxFlag": False,
+                    "refundFlag": False,
+                    "voidFlag": False,
+                },
+            ],
+            "couponArray": [],
+            "tenderArray": [],
+        }
+    ]
+}
+
+
+def test_stacked_and_unlabeled_discounts_both_attribute_positionally():
+    _, items_df, _ = normalize_all(*parse_json(RECEIPT_WITH_STACKED_AND_UNLABELED_DISCOUNTS))
+    net = items_df.set_index("item_description")["net_amount"]
+    assert net["KS SNACK MIX"] == 14.98  # 19.98 - 3.00 - 2.00, both discounts attributed
+
+    top = top_items_by_spend(items_df)
+    row = top[top["item_description"] == "KS SNACK MIX"].iloc[0]
+    assert row["total_spend"] == 14.98

@@ -24,6 +24,32 @@ from dashboard.data.schema import ITEMS_COLUMNS, RECEIPTS_COLUMNS, TENDERS_COLUM
 DISCOUNT_DESCRIPTION_PATTERN = re.compile(r"^/\s*\S+$")
 
 
+def _attribute_discounts(df: pd.DataFrame) -> pd.Series:
+    """Net each discount line's (negative) amount onto the item it discounts.
+
+    A discount line's own description is a "/"-prefixed reference, not a
+    product name (see DISCOUNT_DESCRIPTION_PATTERN above) - sometimes the
+    linked item's number (e.g. "/ 1937959"), sometimes a short label like
+    "/SNAPS" that doesn't identify the item at all. Rather than parse that
+    reference, this uses print order instead: Costco always prints a
+    discount directly under the item it applies to, and item rows are
+    already in that order via line_no, so the nearest preceding
+    non-discount row in the same receipt is the target. This works
+    uniformly for both description styles and handles multiple stacked
+    discounts (e.g. instant savings + a coupon) on the same item.
+    """
+    net = df["amount"].copy()
+    for _, group in df.sort_values("line_no").groupby("receipt_id", sort=False):
+        target_idx = None
+        for idx, row in group.iterrows():
+            if row["is_discount"]:
+                if target_idx is not None and pd.notna(row["amount"]):
+                    net.loc[target_idx] += row["amount"]
+            else:
+                target_idx = idx
+    return net
+
+
 def normalize_receipts(df: pd.DataFrame) -> pd.DataFrame:
     return coerce_schema(df, RECEIPTS_COLUMNS)
 
@@ -31,6 +57,7 @@ def normalize_receipts(df: pd.DataFrame) -> pd.DataFrame:
 def normalize_items(df: pd.DataFrame) -> pd.DataFrame:
     df = coerce_schema(df, ITEMS_COLUMNS)
     df["is_discount"] = df["item_description"].fillna("").str.match(DISCOUNT_DESCRIPTION_PATTERN)
+    df["net_amount"] = _attribute_discounts(df)
     return df
 
 

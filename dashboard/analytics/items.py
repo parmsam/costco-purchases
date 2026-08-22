@@ -9,11 +9,21 @@ def _exclude_discounts(items_df: pd.DataFrame) -> pd.DataFrame:
     return items_df[~items_df["is_discount"].fillna(False)]
 
 
+def _spend_column(items_df: pd.DataFrame) -> str:
+    """'net_amount' (see normalize._attribute_discounts) nets each item's
+    instant-savings/coupon deductions back into its own spend instead of
+    the gross line amount. Falls back to 'amount' for rows normalized
+    before that column existed (e.g. parquet data from an older version
+    that hasn't been re-uploaded since).
+    """
+    return "net_amount" if "net_amount" in items_df.columns else "amount"
+
+
 def top_items_by_spend(items_df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     if items_df.empty:
         return pd.DataFrame(columns=["item_description", "total_spend", "purchase_count"])
     grouped = _exclude_discounts(items_df).groupby("item_description", as_index=False).agg(
-        total_spend=("amount", "sum"), purchase_count=("amount", "count")
+        total_spend=(_spend_column(items_df), "sum"), purchase_count=("amount", "count")
     )
     return grouped.sort_values("total_spend", ascending=False).head(n)
 
@@ -22,7 +32,7 @@ def top_items_by_frequency(items_df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     if items_df.empty:
         return pd.DataFrame(columns=["item_description", "purchase_count", "total_spend"])
     grouped = _exclude_discounts(items_df).groupby("item_description", as_index=False).agg(
-        purchase_count=("amount", "count"), total_spend=("amount", "sum")
+        purchase_count=("amount", "count"), total_spend=(_spend_column(items_df), "sum")
     )
     return grouped.sort_values("purchase_count", ascending=False).head(n)
 
@@ -39,7 +49,7 @@ def distinct_items(items_df: pd.DataFrame, n: int = 50) -> pd.DataFrame:
     real = _exclude_discounts(items_df).dropna(subset=["item_number"])
     grouped = real.groupby("item_number", as_index=False).agg(
         item_description=("item_description", "first"),
-        total_spend=("amount", "sum"),
+        total_spend=(_spend_column(items_df), "sum"),
     )
     return grouped.sort_values("total_spend", ascending=False).head(n)
 
