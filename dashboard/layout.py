@@ -93,6 +93,130 @@ function sortTableBy(th) {
 }
 """)
 
+# Floating right-side jump-nav for pages with several section() blocks
+# (see components.py — each section gets a stable id + data-toc-label).
+# Only renders once a page has enough sections to be worth jumping between;
+# short pages (dashboard, warehouses, departments) stay as-is.
+PAGE_TOC_MIN_SECTIONS = 3
+
+PAGE_TOC_STYLE = Style(f"""
+.page-section {{ scroll-margin-top: 5.5rem; }}
+.page-toc {{
+  position: fixed;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 200px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background) / 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+}}
+.page-toc a {{
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.1;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  padding: 0.2rem 0;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}}
+.page-toc a:hover {{ opacity: 1; color: hsl(var(--foreground)); }}
+.page-toc a.active {{ opacity: 1; color: hsl(var(--primary)); font-weight: 600; }}
+.page-toc .page-toc-dot {{
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}}
+.page-toc a.active .page-toc-dot {{
+  background-color: hsl(var(--primary));
+  transform: scale(1.3);
+}}
+.page-toc .page-toc-label {{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}}
+@media (max-width: 1279px) {{
+  .page-toc .page-toc-label {{ display: none; }}
+  .page-toc {{ padding: 0.6rem; max-width: none; }}
+}}
+@media (max-width: 900px) {{
+  .page-toc {{ display: none; }}
+}}
+""")
+
+# Builds the overlay from whatever .page-section elements are on the current
+# page (see components.py:section()) and scroll-spies them via
+# IntersectionObserver. Runs on every full page load; no rebuild needed on
+# htmx swaps since those only replace content *inside* a section, never the
+# section list itself.
+PAGE_TOC_SCRIPT = Script(f"""
+function initPageToc() {{
+  var old = document.getElementById('page-toc');
+  if (old) old.remove();
+
+  var sections = Array.prototype.filter.call(
+    document.querySelectorAll('.page-section'),
+    function (el) {{ return el.offsetParent !== null; }}
+  );
+  if (sections.length < {PAGE_TOC_MIN_SECTIONS}) return;
+
+  var nav = document.createElement('nav');
+  nav.id = 'page-toc';
+  nav.className = 'page-toc';
+  nav.setAttribute('aria-label', 'Section navigation');
+
+  var links = sections.map(function (el) {{
+    var a = document.createElement('a');
+    a.href = '#' + el.id;
+    a.dataset.target = el.id;
+
+    var dot = document.createElement('span');
+    dot.className = 'page-toc-dot';
+    var label = document.createElement('span');
+    label.className = 'page-toc-label';
+    label.textContent = el.getAttribute('data-toc-label') || el.id;
+
+    a.appendChild(dot);
+    a.appendChild(label);
+    a.addEventListener('click', function (e) {{
+      e.preventDefault();
+      el.scrollIntoView({{behavior: 'smooth', block: 'start'}});
+      history.replaceState(null, '', '#' + el.id);
+    }});
+    nav.appendChild(a);
+    return a;
+  }});
+
+  document.body.appendChild(nav);
+
+  var observer = new IntersectionObserver(function (entries) {{
+    entries.forEach(function (entry) {{
+      if (!entry.isIntersecting) return;
+      links.forEach(function (l) {{ l.classList.remove('active'); }});
+      var link = nav.querySelector('a[data-target="' + entry.target.id + '"]');
+      if (link) link.classList.add('active');
+    }});
+  }}, {{rootMargin: '-20% 0px -70% 0px', threshold: 0}});
+
+  sections.forEach(function (el) {{ observer.observe(el); }});
+}}
+document.addEventListener('DOMContentLoaded', initPageToc);
+""")
+
 NAV_LINKS = [
     ("Dashboard", "/dashboard", "layout-dashboard"),
     ("Trends", "/trends", "trending-up"),
@@ -180,4 +304,6 @@ theme_headers = (
     BASE_COLOR_STYLE,
     THEME_TOGGLE_SCRIPT,
     TABLE_SORT_SCRIPT,
+    PAGE_TOC_STYLE,
+    PAGE_TOC_SCRIPT,
 )

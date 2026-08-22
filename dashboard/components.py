@@ -1,9 +1,16 @@
 """Small reusable MonsterUI-wrapped components."""
 
+import re
 from datetime import datetime, timedelta
 
 from fasthtml.common import Div, Form, Span, Table, Tbody, Td, Th, Thead, Tr
 from monsterui.franken import A, Button, ButtonT, Card, CardT, DivLAligned, H4, LabelInput, P, UkIcon
+
+_SLUG_RE = re.compile(r"[^a-z0-9]+")
+
+
+def _slugify(text: str) -> str:
+    return _SLUG_RE.sub("-", text.lower()).strip("-")
 
 
 def kpi_card(label: str, value: str, sub: str = "", icon: str = "circle"):
@@ -39,7 +46,15 @@ def section(title: str, *content, icon: str = "", controls=None):
         if controls is not None
         else Div(title_group, cls="mb-3")
     )
-    return Div(heading, *content, cls="mb-10")
+    # id + data-toc-label let the page-level TOC (layout.py) discover and
+    # link to sections without every route having to register them itself.
+    return Div(
+        heading,
+        *content,
+        cls="mb-10 page-section",
+        id=f"section-{_slugify(title)}",
+        data_toc_label=title,
+    )
 
 
 def limit_select(path: str, current: int, options: list[int], hidden_fields: dict, label: str = "Show"):
