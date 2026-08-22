@@ -1,4 +1,4 @@
-from dashboard.analytics.items import top_items_by_spend
+from dashboard.analytics.items import filter_items, top_items_by_spend
 from dashboard.analytics.kpis import compute_kpis
 from dashboard.data.normalize import normalize_all
 from dashboard.data.parse_json import parse_json
@@ -124,6 +124,15 @@ RECEIPT_WITH_STACKED_AND_UNLABELED_DISCOUNTS = {
         }
     ]
 }
+
+
+def test_items_search_table_excludes_discount_rows_and_shows_net_amount():
+    receipts_df, items_df, _ = normalize_all(*parse_json(RECEIPT_WITH_DISCOUNT))
+    filtered = filter_items(items_df, receipts_df)
+
+    assert "/ 1937959" not in filtered["item_description"].values
+    row = filtered[filtered["item_description"] == "NIGHT LIGHT NIGHT LIGHT 3PK P216"].iloc[0]
+    assert row["net_amount"] == 18.99  # 23.99 gross - 5.00 discount, no separate discount row left
 
 
 def test_stacked_and_unlabeled_discounts_both_attribute_positionally():

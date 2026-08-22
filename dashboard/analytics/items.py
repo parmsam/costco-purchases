@@ -9,7 +9,7 @@ def _exclude_discounts(items_df: pd.DataFrame) -> pd.DataFrame:
     return items_df[~items_df["is_discount"].fillna(False)]
 
 
-def _spend_column(items_df: pd.DataFrame) -> str:
+def spend_column(items_df: pd.DataFrame) -> str:
     """'net_amount' (see normalize._attribute_discounts) nets each item's
     instant-savings/coupon deductions back into its own spend instead of
     the gross line amount. Falls back to 'amount' for rows normalized
@@ -23,7 +23,7 @@ def top_items_by_spend(items_df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     if items_df.empty:
         return pd.DataFrame(columns=["item_description", "total_spend", "purchase_count"])
     grouped = _exclude_discounts(items_df).groupby("item_description", as_index=False).agg(
-        total_spend=(_spend_column(items_df), "sum"), purchase_count=("amount", "count")
+        total_spend=(spend_column(items_df), "sum"), purchase_count=("amount", "count")
     )
     return grouped.sort_values("total_spend", ascending=False).head(n)
 
@@ -32,7 +32,7 @@ def top_items_by_frequency(items_df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     if items_df.empty:
         return pd.DataFrame(columns=["item_description", "purchase_count", "total_spend"])
     grouped = _exclude_discounts(items_df).groupby("item_description", as_index=False).agg(
-        purchase_count=("amount", "count"), total_spend=(_spend_column(items_df), "sum")
+        purchase_count=("amount", "count"), total_spend=(spend_column(items_df), "sum")
     )
     return grouped.sort_values("purchase_count", ascending=False).head(n)
 
@@ -49,13 +49,18 @@ def distinct_items(items_df: pd.DataFrame, n: int = 50) -> pd.DataFrame:
     real = _exclude_discounts(items_df).dropna(subset=["item_number"])
     grouped = real.groupby("item_number", as_index=False).agg(
         item_description=("item_description", "first"),
-        total_spend=(_spend_column(items_df), "sum"),
+        total_spend=(spend_column(items_df), "sum"),
     )
     return grouped.sort_values("total_spend", ascending=False).head(n)
 
 
 def filter_items(items_df: pd.DataFrame, receipts_df: pd.DataFrame, search: str = "") -> pd.DataFrame:
-    merged = items_df.merge(
+    """The /items 'Search Purchases' table. Excludes discount lines - same
+    convention as the Dashboard's Recent Receipts accordion - since a
+    "/ 1937959" row isn't a purchase in its own right; its amount is
+    already netted onto its item via net_amount (see spend_column above).
+    """
+    merged = _exclude_discounts(items_df).merge(
         receipts_df[["receipt_id", "transaction_date", "warehouse_name"]],
         on="receipt_id",
         how="left",

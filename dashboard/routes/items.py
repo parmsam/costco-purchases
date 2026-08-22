@@ -6,7 +6,13 @@ from fasthtml.common import Div, Form, Input as RawInput, Span
 from monsterui.franken import A, Button, ButtonT, Input, UkIcon
 
 from dashboard.analytics.filters import load_filtered
-from dashboard.analytics.items import distinct_items, filter_items, top_items_by_frequency, top_items_by_spend
+from dashboard.analytics.items import (
+    distinct_items,
+    filter_items,
+    spend_column,
+    top_items_by_frequency,
+    top_items_by_spend,
+)
 from dashboard.components import empty_state, section, sortable_table
 from dashboard.data.normalize import item_label
 from dashboard.data.store import get_item_labels, set_item_label
@@ -17,6 +23,11 @@ ITEMS_TABLE_ROW_LIMIT = 200
 
 
 def _items_table_rows(filtered_df, item_labels: dict):
+    # net_amount (falls back to amount for pre-net_amount parquet data) so
+    # a row with instant savings shows what was actually paid, now that
+    # discount lines themselves are excluded (see analytics.items.filter_items)
+    # rather than appearing as their own separate "/ 1937959" row.
+    amt_col = spend_column(filtered_df)
     table = sortable_table(
         header_data=["Date", "Warehouse", "Item", "Amount"],
         body_data=[
@@ -28,7 +39,7 @@ def _items_table_rows(filtered_df, item_labels: dict):
                 ),
                 "Warehouse": row.warehouse_name,
                 "Item": item_label(row.item_number, row.item_description, item_labels),
-                "Amount": f"${row.amount:,.2f}" if row.amount == row.amount else "",
+                "Amount": f"${amt:,.2f}" if (amt := getattr(row, amt_col)) == amt else "",
             }
             for row in filtered_df.head(ITEMS_TABLE_ROW_LIMIT).itertuples()
         ],
@@ -39,7 +50,7 @@ def _items_table_rows(filtered_df, item_labels: dict):
     # to answer "how much did these matching purchases add up to", which
     # shouldn't silently go stale once a search matches more than that cap.
     item_count = len(filtered_df)
-    total_amount = filtered_df["amount"].sum() if item_count else 0.0
+    total_amount = filtered_df[amt_col].sum() if item_count else 0.0
     shown = min(item_count, ITEMS_TABLE_ROW_LIMIT)
     truncated_note = f" (showing first {shown})" if item_count > ITEMS_TABLE_ROW_LIMIT else ""
     summary = Div(
