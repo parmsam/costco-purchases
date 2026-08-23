@@ -153,6 +153,116 @@ function sortTableBy(th) {
   });
   rows.forEach(function (r) { tbody.appendChild(r); });
 }
+</script>    <style>
+.page-section { scroll-margin-top: 5.5rem; }
+.page-toc {
+  position: fixed;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 200px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background) / 0.85);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+}
+.page-toc a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.1;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  padding: 0.2rem 0;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.page-toc a:hover { opacity: 1; color: hsl(var(--foreground)); }
+.page-toc a.active { opacity: 1; color: hsl(var(--primary)); font-weight: 600; }
+.page-toc .page-toc-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.page-toc a.active .page-toc-dot {
+  background-color: hsl(var(--primary));
+  transform: scale(1.3);
+}
+.page-toc .page-toc-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 1279px) {
+  .page-toc .page-toc-label { display: none; }
+  .page-toc { padding: 0.6rem; max-width: none; }
+}
+@media (max-width: 900px) {
+  .page-toc { display: none; }
+}
+</style>
+<script>
+function initPageToc() {
+  var old = document.getElementById('page-toc');
+  if (old) old.remove();
+
+  var sections = Array.prototype.filter.call(
+    document.querySelectorAll('.page-section'),
+    function (el) { return el.offsetParent !== null; }
+  );
+  if (sections.length < 3) return;
+
+  var nav = document.createElement('nav');
+  nav.id = 'page-toc';
+  nav.className = 'page-toc';
+  nav.setAttribute('aria-label', 'Section navigation');
+
+  var links = sections.map(function (el) {
+    var a = document.createElement('a');
+    a.href = '#' + el.id;
+    a.dataset.target = el.id;
+
+    var dot = document.createElement('span');
+    dot.className = 'page-toc-dot';
+    var label = document.createElement('span');
+    label.className = 'page-toc-label';
+    label.textContent = el.getAttribute('data-toc-label') || el.id;
+
+    a.appendChild(dot);
+    a.appendChild(label);
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      history.replaceState(null, '', '#' + el.id);
+    });
+    nav.appendChild(a);
+    return a;
+  });
+
+  document.body.appendChild(nav);
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (l) { l.classList.remove('active'); });
+      var link = nav.querySelector('a[data-target="' + entry.target.id + '"]');
+      if (link) link.classList.add('active');
+    });
+  }, {rootMargin: '-20% 0px -70% 0px', threshold: 0});
+
+  sections.forEach(function (el) { observer.observe(el); });
+}
+document.addEventListener('DOMContentLoaded', initPageToc);
 </script><script src="https://cdn.plot.ly/plotly-3.7.0.min.js"></script><script>
     const fhPlotlyRegisterOnClick = (plotId, hxPostEndpoint, hxTarget) => {
         const plotlyPlot = document.getElementById(plotId);
@@ -180,7 +290,7 @@ function sortTableBy(th) {
           </div>
 <button aria-controls="mobile-menu" type="button" data-uk-toggle="target: #mobile-menu; cls: hidden" class="md:hidden inline-flex items-center justify-center uk-rounded focus:outline-none focus:ring-2 p-2"><span class="sr-only">Open main menu</span><uk-icon icon="menu" height="24" width="24" class="size-6"></uk-icon></button>          <div id="mobile-menu" class="hidden mt-2 md:mt-0 w-full md:block md:w-auto ">
             <div class="flex gap-3 flex-col items-end md:flex-row md:items-center md:gap-3">
-<a href="dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layout-dashboard" height="16" width="16"></uk-icon>Dashboard</a><a href="trends.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="trending-up" height="16" width="16"></uk-icon>Trends</a><a href="items.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="shopping-cart" height="16" width="16"></uk-icon>Items</a><a href="warehouses.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="warehouse" height="16" width="16"></uk-icon>Warehouses</a><a href="departments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layers" height="16" width="16"></uk-icon>Departments</a><a href="payments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="credit-card" height="16" width="16"></uk-icon>Payments</a><a href="upload.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-primary/10 text-primary"><uk-icon icon="upload" height="16" width="16"></uk-icon>Upload</a><button onclick="cycleTheme()" type="button" id="theme-toggle-btn" class="uk-btn uk-btn-ghost rounded-full px-2" title="Toggle theme (system / light / dark)" name="theme-toggle-btn"><uk-icon icon="monitor" height="16" width="16" id="theme-toggle-icon"></uk-icon></button>            </div>
+<a href="dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layout-dashboard" height="16" width="16"></uk-icon>Dashboard</a><a href="trends.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="trending-up" height="16" width="16"></uk-icon>Trends</a><a href="items.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="shopping-cart" height="16" width="16"></uk-icon>Items</a><a href="warehouses.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="warehouse" height="16" width="16"></uk-icon>Warehouses</a><a href="departments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="layers" height="16" width="16"></uk-icon>Departments</a><a href="payments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"><uk-icon icon="credit-card" height="16" width="16"></uk-icon>Payments</a><a href="upload.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-primary/10 text-primary"><uk-icon icon="upload" height="16" width="16"></uk-icon>Upload</a><button onclick="cycleTheme()" type="button" id="theme-toggle-btn" class="uk-btn uk-btn-ghost rounded-full px-2" title="Toggle theme (system / light / dark)" name="theme-toggle-btn"><uk-icon icon="monitor" height="16" width="16" id="theme-toggle-icon"></uk-icon></button><a href="https://github.com/parmsam/costco-purchases" target="_blank" rel="noopener noreferrer" class="uk-btn-ghost rounded-full px-2 inline-flex items-center" title="View source on GitHub"><uk-icon icon="github" height="16" width="16"></uk-icon></a>            </div>
           </div>
         </nav>
       </div>
@@ -204,7 +314,8 @@ function sortTableBy(th) {
                 </div>
                 <div class="flex justify-start items-center gap-3 items-center">
                   <div class="shrink-0 grid place-items-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</div>
-                  <p class="text-sm text-muted-foreground">Paste downloader/costco_receipt_downloader.js into the browser console.</p>
+                  <p class="text-sm text-muted-foreground">
+Paste <a href="https://github.com/parmsam/costco-purchases/blob/main/downloader/costco_receipt_downloader.js" target="_blank" rel="noopener noreferrer" class="underline text-primary">downloader/costco_receipt_downloader.js</a> into the browser console.                  </p>
                 </div>
                 <div class="flex justify-start items-center gap-3 items-center">
                   <div class="shrink-0 grid place-items-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">3</div>
