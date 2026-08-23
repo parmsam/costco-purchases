@@ -2,7 +2,7 @@
 
 from fasthtml.common import Div, Main, Script, Style, Title
 from monsterui.core import Theme, ThemeRadii
-from monsterui.franken import A, Button, ButtonT, DivLAligned, NavBar, Subtitle, UkIcon, H2
+from monsterui.franken import H2, A, Button, ButtonT, DivLAligned, NavBar, Subtitle, UkIcon
 
 # Neither franken-ui nor daisyUI sets a default text/background color on
 # <body>/<html> — Pico.css was quietly doing that (and, since Pico follows
@@ -99,9 +99,9 @@ function sortTableBy(th) {
 # short pages (dashboard, warehouses, departments) stay as-is.
 PAGE_TOC_MIN_SECTIONS = 3
 
-PAGE_TOC_STYLE = Style(f"""
-.page-section {{ scroll-margin-top: 5.5rem; }}
-.page-toc {{
+PAGE_TOC_STYLE = Style("""
+.page-section { scroll-margin-top: 5.5rem; }
+.page-toc {
   position: fixed;
   top: 50%;
   right: 1rem;
@@ -117,8 +117,8 @@ PAGE_TOC_STYLE = Style(f"""
   background-color: hsl(var(--background) / 0.85);
   backdrop-filter: blur(6px);
   box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
-}}
-.page-toc a {{
+}
+.page-toc a {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -129,33 +129,33 @@ PAGE_TOC_STYLE = Style(f"""
   padding: 0.2rem 0;
   opacity: 0.75;
   transition: opacity 0.15s ease, color 0.15s ease;
-}}
-.page-toc a:hover {{ opacity: 1; color: hsl(var(--foreground)); }}
-.page-toc a.active {{ opacity: 1; color: hsl(var(--primary)); font-weight: 600; }}
-.page-toc .page-toc-dot {{
+}
+.page-toc a:hover { opacity: 1; color: hsl(var(--foreground)); }
+.page-toc a.active { opacity: 1; color: hsl(var(--primary)); font-weight: 600; }
+.page-toc .page-toc-dot {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
   background-color: hsl(var(--muted-foreground));
   flex-shrink: 0;
   transition: background-color 0.15s ease, transform 0.15s ease;
-}}
-.page-toc a.active .page-toc-dot {{
+}
+.page-toc a.active .page-toc-dot {
   background-color: hsl(var(--primary));
   transform: scale(1.3);
-}}
-.page-toc .page-toc-label {{
+}
+.page-toc .page-toc-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}}
-@media (max-width: 1279px) {{
-  .page-toc .page-toc-label {{ display: none; }}
-  .page-toc {{ padding: 0.6rem; max-width: none; }}
-}}
-@media (max-width: 900px) {{
-  .page-toc {{ display: none; }}
-}}
+}
+@media (max-width: 1279px) {
+  .page-toc .page-toc-label { display: none; }
+  .page-toc { padding: 0.6rem; max-width: none; }
+}
+@media (max-width: 900px) {
+  .page-toc { display: none; }
+}
 """)
 
 # Builds the overlay from whatever .page-section elements are on the current

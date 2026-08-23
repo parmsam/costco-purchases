@@ -1,7 +1,6 @@
 """GET /dashboard — KPI cards + monthly trend + recent receipts."""
 
 import plotly.express as px
-
 from fasthtml.common import Div, Span
 from monsterui.franken import A, Accordion, AccordionItem
 

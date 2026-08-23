@@ -3,20 +3,20 @@
 import os
 import uuid
 
-from fasthtml.common import Beforeware, fast_app, RedirectResponse, serve
+from fasthtml.common import Beforeware, RedirectResponse, fast_app, serve
 from fh_plotly import plotly_headers
 
 from dashboard.data import store
 from dashboard.data.store import load_all
 from dashboard.layout import theme_headers
-from dashboard.routes.upload import register_upload_routes
-from dashboard.routes.overview import register_overview_routes
-from dashboard.routes.trends import register_trends_routes
-from dashboard.routes.items import register_items_routes
-from dashboard.routes.warehouses import register_warehouses_routes
 from dashboard.routes.departments import register_departments_routes
+from dashboard.routes.items import register_items_routes
+from dashboard.routes.overview import register_overview_routes
 from dashboard.routes.payments import register_payments_routes
 from dashboard.routes.receipt import register_receipt_routes
+from dashboard.routes.trends import register_trends_routes
+from dashboard.routes.upload import register_upload_routes
+from dashboard.routes.warehouses import register_warehouses_routes
 
 
 async def _assign_session(session):

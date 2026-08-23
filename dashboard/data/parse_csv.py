@@ -10,7 +10,7 @@ import io
 
 import pandas as pd
 
-from dashboard.data.schema import empty_frame, RECEIPTS_COLUMNS, ITEMS_COLUMNS, TENDERS_COLUMNS
+from dashboard.data.schema import ITEMS_COLUMNS, RECEIPTS_COLUMNS, TENDERS_COLUMNS, empty_frame
 
 _RECEIPT_CSV_TO_CANONICAL = {
     "transactionDate": "transaction_date",

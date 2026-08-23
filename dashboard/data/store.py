@@ -27,7 +27,7 @@ from fastlite import database
 
 from dashboard.data import _memory_store
 from dashboard.data.normalize import normalize_all
-from dashboard.data.schema import empty_frame, ITEMS_COLUMNS, RECEIPTS_COLUMNS, TENDERS_COLUMNS
+from dashboard.data.schema import ITEMS_COLUMNS, RECEIPTS_COLUMNS, TENDERS_COLUMNS, empty_frame
 
 EPHEMERAL = bool(os.environ.get("VERCEL") or os.environ.get("DASHBOARD_EPHEMERAL"))
 

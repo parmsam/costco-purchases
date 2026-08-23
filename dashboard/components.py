@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta
 
 from fasthtml.common import Div, Form, Span, Table, Tbody, Td, Th, Thead, Tr
-from monsterui.franken import A, Button, ButtonT, Card, CardT, DivLAligned, H4, LabelInput, P, UkIcon
+from monsterui.franken import H4, A, Button, ButtonT, Card, CardT, DivLAligned, LabelInput, P, UkIcon
 
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
 

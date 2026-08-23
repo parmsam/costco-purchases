@@ -2,7 +2,8 @@
 
 import json
 
-from fasthtml.common import Div, Form, Input as RawInput, Span
+from fasthtml.common import Div, Form, Span
+from fasthtml.common import Input as RawInput
 from monsterui.franken import A, Button, ButtonT, Input, UkIcon
 
 from dashboard.analytics.filters import load_filtered
@@ -17,7 +18,6 @@ from dashboard.components import empty_state, section, sortable_table
 from dashboard.data.normalize import item_label
 from dashboard.data.store import get_item_labels, set_item_label
 from dashboard.layout import page
-
 
 ITEMS_TABLE_ROW_LIMIT = 200
 

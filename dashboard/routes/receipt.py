@@ -1,7 +1,7 @@
 """GET /receipt/{receipt_id} — a printable replica of the in-store paper receipt."""
 
 import pandas as pd
-from fasthtml.common import Div, P, Span, Style
+from fasthtml.common import Div, Span, Style
 from monsterui.franken import A, Button, ButtonT, Card, UkIcon
 
 from dashboard.analytics.receipt import get_receipt

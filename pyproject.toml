@@ -16,7 +16,26 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+extend-exclude = [".reference", "docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+# E501 (line too long) off: FastHTML/MonsterUI component chains are
+# idiomatically long, and existing lines already run well past any
+# reasonable limit (up to 230 chars) - not a real issue to fix.
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# FastHTML convention: every route handler is named after its HTTP verb
+# (`get`, `post`) inside its own @rt(...) decorator, so a module registering
+# multiple routes has multiple functions named `get`/`post` on purpose -
+# not an accidental redefinition, which is what F811 assumes.
+"dashboard/routes/*.py" = ["F811"]
